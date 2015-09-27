@@ -34,7 +34,7 @@ def main():
     parser.add_argument('-s', '--summary', help='Search summary',
                         action='store_true')
     parser.add_argument('-k', '--keywords', help='Search keywords',
-                        action='store_true', default=True)
+                        action='store_true')
     parser.add_argument('-q', '--query', help='query string', required=True)
     args = parser.parse_args()
     run(args)
