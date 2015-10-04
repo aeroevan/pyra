@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 import nltk
 import string
+import logging
 import operator
+
+logger = logging.getLogger(__name__)
 
 
 def isPunct(word):
@@ -73,5 +76,6 @@ class RakeKeywordExtractor(object):
         if incl_scores:
             return sorted_phrase_scores[0:int(n_phrases/self.top_fraction)]
         else:
+            logger.debug("Top phrase: {0}".format(sorted_phrase_scores[0][0]))
             return map(lambda x: x[0],
                        sorted_phrase_scores[0:int(n_phrases/self.top_fraction)])

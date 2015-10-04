@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
+import logging
 from heapq import nlargest
 from string import punctuation
 from collections import defaultdict
 from nltk.corpus import stopwords
 from nltk.tokenize import sent_tokenize, word_tokenize
+
+logger = logging.getLogger(__name__)
 
 
 class FrequencySummarizer(object):
@@ -46,6 +49,7 @@ class FrequencySummarizer(object):
         """
         sents = sent_tokenize(text)
         if (len(sents) < n):
+            logging.info("Number of sentences is under {0}".format(n))
             return sents
         assert n <= len(sents)
         word_sent = [word_tokenize(s.lower()) for s in sents]
@@ -56,6 +60,7 @@ class FrequencySummarizer(object):
                 if w in self._freq:
                     ranking[i] += self._freq[w]
         sents_idx = self._rank(ranking, n)
+        logging.debug([sents[j] for j in sents_idx])
         return [sents[j] for j in sents_idx]
 
     def _rank(self, ranking, n):
