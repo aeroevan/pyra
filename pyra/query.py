@@ -6,6 +6,8 @@ from whoosh.qparser import QueryParser
 
 def run(args):
     ix = open_dir(args.index)
+    if not args.content and not args.summary and not args.keywords:
+        args.content = True
     with ix.searcher() as searcher:
         if args.content:
             parser = QueryParser("content", ix.schema)
