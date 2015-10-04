@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import logging
 from whoosh import index
 from whoosh.fields import Schema, ID, TEXT, STORED, KEYWORD
 import magic
@@ -11,6 +12,7 @@ from nltk.corpus import stopwords
 from collections import defaultdict
 from string import punctuation
 from heapq import nlargest
+logger = logging.getLogger(__name__)
 
 
 class FrequencySummarizer(object):
@@ -159,6 +161,7 @@ class TextIndexer(object):
                     yield fullpath
 
     def _add_doc(self, writer, path):
+        logger.debug("Indexing {0}".format(path))
         fileobj = open(path, "rt")
         content = fileobj.read()
         summary = "\n".join(self._fs.summarize(content, self._summary_size))
@@ -191,8 +194,10 @@ class TextIndexer(object):
 
     def index(self, clean=False):
         if clean:
+            logger.info('Clearing existing index')
             self.clean_index()
         else:
+            logger.info('Incremental index')
             self.incremental_index()
 
     def incremental_index(self):
@@ -223,6 +228,7 @@ class TextIndexer(object):
                     if mtime > indexed_time:
                         # The file has changed, delete it and add it to the list
                         # of files to reindex
+                        logging.debug("{0} has changed".format(indexed_path))
                         writer.delete_by_term('path', indexed_path)
                         to_index.add(indexed_path)
 
@@ -255,7 +261,14 @@ def main():
     parser.add_argument('-c', '--clear',
                         help='Clear and reindex',
                         action='store_true')
+    parser.add_argument('-v', '--verbose', action='count', default=0)
+    parser.add_argument('-q', '--quiet', action='count', default=0)
+
     args = parser.parse_args()
+
+    logging_level = logging.WARN + 10*args.quiet - 10*args.verbose
+    logging.basicConfig(level=logging_level)
+
     ti = TextIndexer(args.index, args.documents, args.summary)
     ti.index(args.clear)
 
