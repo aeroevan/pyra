@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import logging
+from collections import defaultdict
 from heapq import nlargest
 from string import punctuation
-from collections import defaultdict
+
 from nltk.corpus import stopwords
 from nltk.tokenize import sent_tokenize, word_tokenize
 
@@ -18,7 +19,7 @@ class FrequencySummarizer(object):
         """
         self._min_cut = min_cut
         self._max_cut = max_cut
-        self._stopwords = set(stopwords.words('english') + list(punctuation))
+        self._stopwords = set(stopwords.words("english") + list(punctuation))
 
     def _compute_frequencies(self, word_sent):
         """
@@ -39,7 +40,7 @@ class FrequencySummarizer(object):
         for w in freq.keys():
             if freq[w] >= self._max_cut or freq[w] <= self._min_cut:
                 continue
-            new_freq[w] = freq[w]/m
+            new_freq[w] = freq[w] / m
         return new_freq
 
     def summarize(self, text, n):
@@ -48,7 +49,7 @@ class FrequencySummarizer(object):
             which represent the summary of text.
         """
         sents = sent_tokenize(text)
-        if (len(sents) < n):
+        if len(sents) < n:
             logging.info("Number of sentences is under {0}".format(n))
             return sents
         assert n <= len(sents)

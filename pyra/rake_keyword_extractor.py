@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-import nltk
-import string
 import logging
 import operator
+import string
+
+import nltk
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +14,7 @@ def isPunct(word):
 
 def isNumeric(word):
     try:
-        float(word) if '.' in word else int(word)
+        float(word) if "." in word else int(word)
         return True
     except ValueError:
         return False
@@ -27,8 +28,10 @@ class RakeKeywordExtractor(object):
     def _generate_candidate_keywords(self, sentences):
         phrase_list = []
         for sentence in sentences:
-            words = map(lambda x: "|" if x in self.stopwords else x,
-                        nltk.word_tokenize(sentence.lower()))
+            words = map(
+                lambda x: "|" if x in self.stopwords else x,
+                nltk.word_tokenize(sentence.lower()),
+            )
             phrase = []
             for word in words:
                 if word == "|" or isPunct(word):
@@ -68,14 +71,16 @@ class RakeKeywordExtractor(object):
         sentences = nltk.sent_tokenize(text)
         phrase_list = self._generate_candidate_keywords(sentences)
         word_scores = self._calculate_word_scores(phrase_list)
-        phrase_scores = self._calculate_phrase_scores(
-            phrase_list, word_scores)
-        sorted_phrase_scores = sorted(phrase_scores.items(),
-                                      key=operator.itemgetter(1), reverse=True)
+        phrase_scores = self._calculate_phrase_scores(phrase_list, word_scores)
+        sorted_phrase_scores = sorted(
+            phrase_scores.items(), key=operator.itemgetter(1), reverse=True
+        )
         n_phrases = len(sorted_phrase_scores)
         if incl_scores:
-            return sorted_phrase_scores[0:int(n_phrases/self.top_fraction)]
+            return sorted_phrase_scores[0 : int(n_phrases / self.top_fraction)]
         else:
             logger.debug("Top phrase: {0}".format(sorted_phrase_scores[0][0]))
-            return map(lambda x: x[0],
-                       sorted_phrase_scores[0:int(n_phrases/self.top_fraction)])
+            return map(
+                lambda x: x[0],
+                sorted_phrase_scores[0 : int(n_phrases / self.top_fraction)],
+            )
